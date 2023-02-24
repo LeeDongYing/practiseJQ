@@ -1,0 +1,253 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />	
+	
+	<link rel="stylesheet" href="themes/base/jquery.ui.all.css">
+	<script type="text/javascript" src="jquery-1.4.4.js"></script>
+	<script type="text/javascript" src="jquery.maskedinput-1.2.1.js"></script>	
+	<script src="jquery.ui.core.js"></script>
+	<script src="jquery.ui.widget.js"></script>
+	<script src="jquery.ui.datepicker.js"></script>
+	<script src="projectJobAjax.js"></script>
+	<script type="text/javascript" src="datepicker-zh-TW.js"></script>	
+	
+
+	<style type="text/css">
+		div.ui-datepicker{
+			font-size:10px;
+		}
+	</style>		
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#workDate").datepicker({
+				onSelect: function(){						 
+					var workDate = $(this).datepicker('getDate');
+					alert(workDate.getFullYear()+"/"+(workDate.getMonth()+1)+"/"+workDate.getDate());
+				}
+			});
+			$("#project0").change(()=>{
+				
+				let projectValue0 =  $("#project0").val()
+				if(projectValue0 != '0'){
+					stageAjax(projectValue0)
+				}else{
+					$("#stage0").empty();
+					$('#stage0').append('<option value="0">請選擇</option>')
+				}
+			})
+			$('#stage0').change(()=>{
+				let stageValue0 =  $("#stage0").val()
+				if(stageValue0 != '0'){
+					jobAjax(stageValue0)
+				}else{
+					$("#item0").empty();
+					$('#item0').append('<option value="0">請選擇</option>')
+				}
+			})
+
+			var count = 1;
+
+  			$("#doInsButton").click(function() {
+    			var newRow = $("<tr>");
+    			var cols = "";
+
+    			cols += '<td><select name="project" id="project' + count + '"><option value="0">請選擇</option><option value="A">教育訓練</option><option value="B">休假</option><option value="C">會議</option><option value="D">一般事務</option><option value="E">其它活動</option></select></td>';
+    			cols += '<td><select name="stage" id="stage' + count + '"><option value="0">請選擇</option></select></td>';
+    			cols += '<td><select name="item" id="item' + count + '"><option value="0">請選擇</option></select></td>';
+				cols += '<td><p align="center"><input type="text" name="workContent" id="workContent'+count+'" size="27"></p></td>';
+				cols += '<td><input type="text" name="workHr" id="workHr'+count+'" size="1" value="0.0"></td>';
+   				 newRow.append(cols);
+    			$("#detailList").append(newRow);
+
+    			count++;
+			});
+		});
+	</script>
+
+<title>工作日誌員工系統</title>
+</head>
+
+<body>
+
+<p><img border="0" src="banner.jpg" width="1000" height="100"></p>
+
+<table border="0" width="800" height="100%" id="table1">
+	<tr>
+		<td width="996" colspan="3" height="20">
+			<p><font size="4"><font color="#FF6600"><b>工作日誌維護</b></font> </font> </p>
+			<table border="1" width="850" id="table2" bordercolorlight="#0000FF" bordercolordark="#0000FF">
+				<tr>
+					<td width="118" bgcolor="#9999FF">部門：</td>
+					<td width="72">開發中心</td>
+					<td width="88" bgcolor="#9999FF">員工編號：</td>
+					<td width="61">164</td>
+					<td width="119" bgcolor="#9999FF">姓名：</td>
+					<td width="77">李昱賞</td>
+					<td width="54" bgcolor="#9999FF">職稱：</td>
+					<td width="211">程式設計師</td>					
+				</tr>
+				<tr>
+					<td width="118" bgcolor="#9999FF" height="23">工作日誌日期：</td>
+					<td width="72" height="23" >
+						<label id="work_Date"></label>
+					</td>
+					<td bgcolor="#9999FF" height="23">狀態：</td>
+					<td height="23">
+						<font color="#FF0000"><label id="workState">未送交</label></font>
+					</td>
+					<td bgcolor="#9999FF" height="23">本日工時總計：</td>
+					<td colspan="3" height="23">
+						<label id="totalWorkHr"></label>
+						<input type="hidden" id="InputWorkHr" size="1"/>
+					</td>
+				</tr>
+				<tr>
+
+					<td  colspan="8">
+						<p align="right">
+						<input type="button" value="新增" id="doInsButton" />
+						<input type="button" value="刪除" id="doDelButton" onclick="doDelete();"/>
+						<input type="button" value="清除" id="doClearButton" onclick="doClear();"/>
+						<input type="button" value="重設" id="doResButton" onclick="doReset();"/>					
+					</td>
+				</tr>
+
+			</table>		
+			
+		</td>
+	</tr>
+	<tr>
+		<td width="990" height="10" colspan="3">
+			<hr noshade color="#FF0000">
+		</td>
+	</tr>
+	<tr>
+		<td width="200" valign="top"><div id="workDate"/></td>
+		<td width="800" valign="top" colspan="2" align="left">	
+			<table border="1" width="100%" id="table3" bordercolorlight="#0000FF" bordercolordark="#0000FF">
+				<tr height="28" bgcolor="#9999FF">						
+					<th width="15%">專案</th>
+					<th width="15%">階段</th>
+					<th width="21%">工作項目</th>
+					<th width="33%">工作內容</th>
+					<th width="7%">工時</th>
+				</tr>
+				
+				<tbody id="detailList">
+					<tr  class="project" style="background-color: rgb(255, 255, 255);">
+						<input  name="detailId" type="hidden" value="0" size="1">
+						<td><select name="project" id="project0"><option
+									value="0">請選擇</option>
+								<option value="A">教育訓練</option>
+								<option value="B">休假</option>
+								<option value="C">會議</option>
+								<option value="D">一般事務</option>
+								<option value="E">其它活動</option></select></td>
+						<td><select name="stage" id="stage0"><option
+									value="0">請選擇</option></select></td>
+						<td><select name="item" id="item0"><option
+									value="0">請選擇</option></select></td>
+						<td><p align="center">
+								<input type="text" name="workContent" id="workContent0" size="27">
+							</p></td>
+						<td><input type="text" name="workHr" id="workHr0" size="1" value="0.0"></td>
+					</tr>
+					<tr style="background-color: rgb(255, 255, 255);">
+						<input name="detailId" type="hidden" value="1" size="1">
+						<td><select  class="project" name="project" id="project1"><option
+									value="0">請選擇</option>
+								<option value="A">教育訓練</option>
+								<option value="B">休假</option>
+								<option value="C">會議</option>
+								<option value="D">一般事務</option>
+								<option value="E">其它活動</option></select></td>
+						<td><select name="stage" id="stage1"><option
+									value="0">請選擇</option>
+						<td><select name="item" id="item1"><option
+									value="0">請選擇</option>
+						<td><p align="center">
+								<input type="text" name="workContent" id="workContent1"
+									size="27">
+							</p></td>
+						<td><input type="text" name="workHr" id="workHr1" size="1"
+							value="0.0"></td>
+					</tr>
+					<tr style="background-color: rgb(0, 204, 255);">
+						<input  name="detailId" type="hidden" value="2" size="1">
+						<td><select class="project"  name="project" id="project2"><option
+									value="0">請選擇</option>
+								<option value="A">教育訓練</option>
+								<option value="B">休假</option>
+								<option value="C">會議</option>
+								<option value="D">一般事務</option>
+								<option value="E">其它活動</option></select></td>
+						<td><select name="stage" id="stage2"><option
+									value="0">請選擇</option>
+						<td><select name="item" id="item2"><option
+									value="0">請選擇</option>
+						<td><p align="center">
+								<input type="text" name="workContent" id="workContent2"
+									size="27">
+							</p></td>
+						<td><input type="text" name="workHr" id="workHr2" size="1"
+							value="0.0"></td>
+					</tr>
+					<tr style="background-color: rgb(255, 255, 255);">
+						<input  name="detailId" type="hidden" value="3" size="1">
+						<td><select class="project" name="project" id="project3"><option
+									value="0">請選擇</option>
+								<option value="A">教育訓練</option>
+								<option value="B">休假</option>
+								<option value="C">會議</option>
+								<option value="D">一般事務</option>
+								<option value="E">其它活動</option></select></td>
+						<td><select name="stage" id="stage3"><option
+									value="0">請選擇</option></select></td>
+						<td><select name="item" id="item3"><option
+									value="0">請選擇</option></select></td>
+						<td><p align="center">
+								<input type="text" name="workContent" id="workContent3"
+									size="27">
+							</p></td>
+						<td><input type="text" name="workHr" id="workHr3" size="1"
+							value="0.0"></td>
+					</tr>
+					<tr style="background-color: rgb(255, 255, 255);">
+						<input  name="detailId" type="hidden" value="4" size="1">
+						<td><select class="project" name="project" id="project4"><option
+									value="0">請選擇</option>
+								<option value="A">教育訓練</option>
+								<option value="B">休假</option>
+								<option value="C">會議</option>
+								<option value="D">一般事務</option>
+								<option value="E">其它活動</option></select></td>
+						<td><select name="stage" id="stage4"><option
+									value="0">請選擇</option></select></td>
+						<td><select name="item" id="item4"><option
+									value="0">請選擇</option></select></td>
+						<td><p align="center">
+								<input type="text" name="workContent" id="workContent4"
+									size="27">
+							</p></td>
+						<td><input type="text" name="workHr" id="workHr4" size="1"
+							value="0.0"></td>
+					</tr>
+					</tbody>
+				
+				<tr>
+					<td colspan="6">
+						<p align="center">
+						<input type="button" value="儲存" onclick="workSave();"/>
+						<input type="button" value="送交" onclick="workSubmit();"/>						
+					</td>
+				</tr>
+			</table>
+			
+		</td>
+	</tr>
+</table>
+
+</body>
+
+</html>
